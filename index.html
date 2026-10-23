@@ -99,10 +99,13 @@ body.sub .floorsnav{display:none}
 .cal button{background:var(--ink);color:#fff;cursor:pointer}
 .cal button:hover{outline:2px solid #fff}
 .cal button.x{background:transparent;color:#ffffff88;text-decoration:line-through;cursor:not-allowed;outline:0}
+.cal button.half{position:relative}
+.cal button.half:after{content:"";position:absolute;bottom:7px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:#C8102E}
 .cal button.sel{background:#fff;color:var(--ink);outline:3px solid var(--ink)}
 .cal i{background:none}
 .legend{display:flex;gap:18px;font-size:12px;letter-spacing:.1em;margin:14px 0 18px;text-transform:uppercase}
 .legend span:before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--ink)}
+.legend span.h:before{border-radius:50%;background:radial-gradient(circle at 50% 78%,#C8102E 0 3px,var(--ink) 3.5px)}
 .legend span.u:before{background:transparent;border:1px solid #fff}
 .calwrap{display:grid;grid-template-columns:minmax(0,720px);justify-content:center;gap:40px;align-items:end}
 @media (max-width:860px){.calwrap{grid-template-columns:minmax(0,1fr)}}
@@ -356,8 +359,8 @@ body.sub .homeonly{display:none}
     <div class="calwrap">
       <div>
         <div class="calhead"><button id="prev" type="button" aria-label="Previous month">&#8592;</button><b id="mlabel"></b><button id="next" type="button" aria-label="Next month">&#8594;</button></div>
-        <div class="cal" id="cal"></div>
-        <div class="legend"><span>Open</span><span class="u">Booked</span></div>
+        <div class="cal" id="cal"></div><div id="slots" style="margin:14px 0 4px"></div>
+        <div class="legend"><span>Open</span><span class="h">Almost booked</span><span class="u">Booked</span></div>
         <button class="btn solid nudge" id="holdbtn" type="button">Build your vibe board &#8595;</button>
         <div class="note" id="selnote" style="color:#fff;opacity:.9;margin-top:12px;font-size:13px;letter-spacing:.08em;text-transform:uppercase">Pick any open date, then show us the feeling</div>
       </div>
@@ -584,17 +587,48 @@ lanes.forEach(function(l){var b=document.createElement('button');b.className='la
 /* ---------- calendar ---------- */
 var M0=new Date(2026,9,1),mi=0,MAX=6,KB={},TODAY=(function(){var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())})(),MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function hash(y,m,d){var x=(y*372+m*31+d)*2654435761%4294967296;return (x>>>8)%100}
-fetch('https://11ff-inquiries.labelthemuse92.workers.dev/busy').then(function(r){return r.json()}).then(function(d){(d.days||[]).forEach(function(x){var p=x.split('-');KB[+p[0]+'-'+(+p[1])+'-'+(+p[2])]=1});drawCal()}).catch(function(){});
-function booked(y,m,d){return new Date(y,m,d)<new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()+2)||!!KB[y+'-'+(m+1)+'-'+d]}
+var LEADD=2;
+function pk(k){var p=k.split('-');return new Date(+p[0],+p[1]-1,+p[2])}
+function kk(dt){return dt.getFullYear()+'-'+(dt.getMonth()+1)+'-'+dt.getDate()}
+function fmtD(dt){return MN[dt.getMonth()]+' '+dt.getDate()+', '+dt.getFullYear()}
+fetch('https://11ff-inquiries.labelthemuse92.workers.dev/busy').then(function(r){return r.json()}).then(function(d){var s=d.slots||{};Object.keys(s).forEach(function(x){var p=x.split('-');KB[+p[0]+'-'+(+p[1])+'-'+(+p[2])]=s[x]});drawCal();drawSlots()}).catch(function(){});
+function past(y,m,d){return new Date(y,m,d)<new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()+LEADD)}
+function booked(y,m,d){return past(y,m,d)||KB[y+'-'+(m+1)+'-'+d]==='F'}
+function openDay(dt){return !past(dt.getFullYear(),dt.getMonth(),dt.getDate())&&!KB[kk(dt)]}
+var rangeMsg='';
+function setSel(a,b,slot){
+ if(!a){S.date=null;return}
+ if(b&&b>a){var la=fmtD(a);if(a.getFullYear()===b.getFullYear())la=la.replace(/, \d{4}$/,'');S.date={key:kk(a),end:kk(b),slot:'',label:la+' to '+fmtD(b)}}
+ else S.date={key:kk(a),end:'',slot:slot||'',label:fmtD(a)+(slot?' · '+slot:'')};
+}
+function rangeOK(a,b){var n=Math.round((b-a)/86400000);if(n<1||n>6)return false;for(var i=0;i<=n;i++){if(!openDay(new Date(a.getFullYear(),a.getMonth(),a.getDate()+i)))return false}return true}
+function inSel(dt){if(!S.date)return false;var a=pk(S.date.key);if(!S.date.end)return +dt===+a;var b=pk(S.date.end);return dt>=a&&dt<=b}
+function drawSlots(){
+ var el=$('#slots');if(!el)return;
+ if(!S.date){el.innerHTML='<div class="note" style="opacity:.85">'+rangeMsg+'</div>';return}
+ if(S.date.end){el.innerHTML='<div class="note" style="opacity:.9">All day, every day in this range. Tap another date to start over.</div>';return}
+ var st=KB[S.date.key]||'',h='<div class="note" style="margin-bottom:8px;opacity:.9">Pick your slot</div><div style="display:flex;gap:10px;flex-wrap:wrap">';
+ [['AM','Morning (AM)','A'],['PM','Evening (PM)','P']].forEach(function(o){var off=st===o[2]||st==='F';h+='<button type="button" style="flex:1;min-width:130px;padding:12px 10px;font-size:15px" class="btn'+(S.date.slot===o[0]?' solid':'')+'" data-slot="'+o[0]+'"'+(off?' disabled':'')+'>'+o[1]+(off?' (booked)':'')+'</button>'});
+ h+='</div><div class="note" style="margin-top:10px;opacity:.8">'+(rangeMsg||'Need more than one day? Tap a later date to book a range, up to 7 days.')+'</div>';
+ el.innerHTML=h;
+ $$('button[data-slot]',el).forEach(function(b){b.addEventListener('click',function(){var a=pk(S.date.key);setSel(a,null,b.getAttribute('data-slot'));sync();drawSlots()})});
+}
 function drawCal(){
  var d0=new Date(M0.getFullYear(),M0.getMonth()+mi,1),y=d0.getFullYear(),m=d0.getMonth();
  $('#mlabel').textContent=MN[m]+' '+y;$('#prev').disabled=mi===0;$('#next').disabled=mi===MAX;
  var h='';'SMTWTFS'.split('').forEach(function(c){h+='<span class="hh" style="text-align:center">'+c+'</span>'});
  for(var i=0;i<d0.getDay();i++)h+='<i></i>';
  var n=new Date(y,m+1,0).getDate();
- for(var d=1;d<=n;d++){var key=y+'-'+(m+1)+'-'+d,bk=booked(y,m,d),sel=S.date&&S.date.key===key;h+='<button type="button" data-k="'+key+'" data-d="'+d+'" class="'+(bk?'x':'')+(sel?' sel':'')+'"'+(bk?' disabled aria-label="'+d+' booked"':'')+'>'+d+'</button>'}
+ for(var d=1;d<=n;d++){var key=y+'-'+(m+1)+'-'+d,bk=booked(y,m,d),sel=inSel(new Date(y,m,d)),half=!bk&&!!KB[key];h+='<button type="button" data-k="'+key+'" data-d="'+d+'" class="'+(bk?'x':'')+(half?' half':'')+(sel?' sel':'')+'"'+(bk?' disabled aria-label="'+d+' booked"':'')+'>'+d+'</button>'}
  var c=$('#cal');c.innerHTML=h;
- $$('button:not(.x)',c).forEach(function(b){b.addEventListener('click',function(){var dd=+b.getAttribute('data-d');S.date={key:b.getAttribute('data-k'),label:MN[m]+' '+dd+', '+y};sync();drawCal()})});
+ $$('button:not(.x)',c).forEach(function(b){b.addEventListener('click',function(){
+  var key=b.getAttribute('data-k'),pd=pk(key),cu=S.date;rangeMsg='';
+  if(cu&&!cu.end&&cu.key!==key&&pd>pk(cu.key)){
+   if(rangeOK(pk(cu.key),pd))setSel(pk(cu.key),pd);
+   else{rangeMsg='A range needs fully open days, up to 7 in a row. Starting over from the date you tapped.';var s0=KB[key];setSel(pd,null,s0==='A'?'PM':'AM')}
+  }else if(cu&&!cu.end&&cu.key===key){}
+  else{var s1=KB[key];setSel(pd,null,s1==='A'?'PM':'AM')}
+  sync();drawCal();drawSlots()})});
 }
 $('#prev').addEventListener('click',function(){if(mi>0){mi--;drawCal()}});$('#next').addEventListener('click',function(){if(mi<MAX){mi++;drawCal()}});
 $('#holdbtn').addEventListener('click',function(){go('vibe')});
@@ -666,7 +700,7 @@ $('#form').addEventListener('submit',function(e){
  if(!n||!/^\S+@\S+\.\S+$/.test(em)){er.hidden=false;er.textContent='Add your name and a valid email so Kevin can reply.';return}
  er.hidden=true;
  var sb=$('#form button[type=submit]');sb.disabled=true;sb.textContent='Sending...';
- fetch('https://11ff-inquiries.labelthemuse92.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,lane:S.lane||$('#f_lane').value,date:S.date?S.date.label:'',dateKey:S.date?S.date.key:'',location:$('#f_loc').value,budget:'',package:S.tier||'',addons:Array.prototype.map.call(document.querySelectorAll('#f_add [aria-pressed=true]'),function(b){return b.textContent}),vibe:vibeList(),vibeSummary:vibeSum(),vision:$('#f_msg').value})})
+ fetch('https://11ff-inquiries.labelthemuse92.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,lane:S.lane||$('#f_lane').value,date:S.date?S.date.label:'',dateKey:S.date?S.date.key:'',dateEndKey:S.date?S.date.end:'',slot:S.date?S.date.slot:'',location:$('#f_loc').value,budget:'',package:S.tier||'',addons:Array.prototype.map.call(document.querySelectorAll('#f_add [aria-pressed=true]'),function(b){return b.textContent}),vibe:vibeList(),vibeSummary:vibeSum(),vision:$('#f_msg').value})})
  .then(function(r){return r.json()}).then(function(j){if(!j.ok)throw 0;
  $('#formbox').innerHTML='<div class="thanks"><h3>Got it, '+n.replace(/[<>&]/g,'')+'.</h3><p>Kevin will reply to '+em.replace(/[<>&]/g,'')+' within a day.'+(S.date?' '+S.date.label+' is held for you in the meantime.':'')+(S.vibe.length?' Your vibe board came along with '+S.vibe.length+' frame'+(S.vibe.length>1?'s':'')+'.':'')+'</p></div>';
  })
