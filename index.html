@@ -752,7 +752,8 @@ var MORE={'Your day':[['Birthdays, Sweet 16s, baby showers and more',[
 'Artists + events':[['Build your own crew: day rates',[
 ['Half day','Up to 4 hours','$1,800','$540','Cinematographer $1,800','Second cinematographer or photographer $750','Drone operator $500','Editor $600','Colorist $500','Live stream technician $600'],
 ['Full day','Up to 8 hours','$3,200','$960','Cinematographer $3,200','Second cinematographer or photographer $1,350','Drone operator $800','Editor $1,000','Colorist $800','Live stream technician $1,000']]]]};
-var pl='Your day',pf=$('#pf'),tg=$('#tiers');
+PR={'Brands':PR['Brands'],'Artists + events':PR['Artists + events'],'Your day':PR['Your day']};
+var pl='Brands',pf=$('#pf'),tg=$('#tiers');
 Object.keys(PR).forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=k;b.addEventListener('click',function(){pl=k;drawP()});pf.appendChild(b)});
 function tierCard(p,i,feat){var d=document.createElement('div');d.className='tier'+(feat?' feat':'');
   d.innerHTML=(feat?'<span class="badge">Most booked</span>':'')+'<div class="from">Starting at*</div><h3>'+p[0]+'</h3><p class="for"><span class="rf">Recommended for</span>'+p[1]+'</p><div class="price">'+p[2]+'<small>starting estimate*</small></div><div class="ret">Retainer to hold your date: '+p[3]+'</div><ul>'+p.slice(4).map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><button class="btn" type="button">Choose '+p[0]+' &#8599;&#xFE0E;</button>';
