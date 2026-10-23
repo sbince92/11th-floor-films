@@ -585,7 +585,7 @@ lanes.forEach(function(l){var b=document.createElement('button');b.className='la
 var M0=new Date(2026,9,1),mi=0,MAX=6,KB={},TODAY=(function(){var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())})(),MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function hash(y,m,d){var x=(y*372+m*31+d)*2654435761%4294967296;return (x>>>8)%100}
 fetch('https://11ff-inquiries.labelthemuse92.workers.dev/busy').then(function(r){return r.json()}).then(function(d){(d.days||[]).forEach(function(x){var p=x.split('-');KB[+p[0]+'-'+(+p[1])+'-'+(+p[2])]=1});drawCal()}).catch(function(){});
-function booked(y,m,d){return new Date(y,m,d)<TODAY||!!KB[y+'-'+(m+1)+'-'+d]}
+function booked(y,m,d){return new Date(y,m,d)<new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()+2)||!!KB[y+'-'+(m+1)+'-'+d]}
 function drawCal(){
  var d0=new Date(M0.getFullYear(),M0.getMonth()+mi,1),y=d0.getFullYear(),m=d0.getMonth();
  $('#mlabel').textContent=MN[m]+' '+y;$('#prev').disabled=mi===0;$('#next').disabled=mi===MAX;
