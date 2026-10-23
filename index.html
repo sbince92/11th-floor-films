@@ -238,7 +238,7 @@ body.sub .homeonly{display:none}
 .tier.feat li:before{background:#fff}
 .tier .btn{width:100%;font-size:22px;padding:11px}
 .tier.feat .btn{background:#fff;color:var(--ink);border-color:#fff}
-.always{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.xh{font-family:var(--disp);font-weight:400;font-size:clamp(28px,4vw,40px);letter-spacing:.03em;margin:40px 0 12px}.always{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
 /* opener */
 .opener{position:fixed;inset:0;z-index:100;background:var(--ink);overflow:hidden}
 .opener.gone{display:none}
@@ -476,9 +476,9 @@ body.sub .homeonly{display:none}
       <h2 style="font-size:clamp(44px,8vw,96px);margin:16px 0 14px;max-width:24ch">Get an estimate. Endless possibilities.</h2>
       <p style="max-width:56ch;margin:0 0 22px">Pick your lane, get an estimate, and hold your date with a retainer. If your project sits between tiers, the inquiry form is the place to say so.</p>
       <div class="fchips" id="pf"></div>
-      <div class="tiers" id="tiers"></div>
+      <div class="tiers" id="tiers"></div><div id="tiersmore"></div>
       <p class="fine"><b>*</b> Estimates, not final prices. Every film is built around your story, so your exact number is set after we talk it through together.</p>
-      <div class="always"><span class="chip">Retainer holds your date</span><span class="chip">Balance due before the shoot</span><span class="chip">Raw footage on request</span><span class="chip">Two rounds of edits</span></div>
+      <div class="always"><span class="chip">Retainer holds your date</span><span class="chip">Balance due before the shoot</span><span class="chip">Raw footage on request</span><span class="chip">Revisions included</span></div>
     </div>
   </div>
 </section>
@@ -689,8 +689,8 @@ function sync(){
  var cs=$$('#lanelist .lane');lanes.forEach(function(l,i){cs[i].classList.toggle('sel',S.lane===l[2])});
 }
 $('#f_lane').addEventListener('change',function(){S.lane=this.value;sync()});
-function tierStr(l,p){return p[0]+' (recommended for '+l.toLowerCase()+') starting at '+p[2]+(l==='Brands'?' per month':'')}
-function buildTierSel(){var ft=$('#f_tier');if(!ft||typeof PR==='undefined')return;var ls=S.lane&&PR[S.lane]?[S.lane]:Object.keys(PR),h='<option value="">Not sure yet, Kevin can recommend</option>';ls.forEach(function(l){h+='<optgroup label="'+l+'">'+PR[l].map(function(p){return '<option value="'+tierStr(l,p)+'">'+p[0]+', from '+p[2]+(l==='Brands'?'/mo':'')+' &middot; '+p[1]+'</option>'}).join('')+'</optgroup>'});ft.innerHTML=h;ft.value=S.tier||''}
+function tierStr(l,p){return p[0]+' (recommended for '+l.toLowerCase()+') starting at '+p[2]+''}
+function buildTierSel(){var ft=$('#f_tier');if(!ft||typeof PR==='undefined')return;var ls=S.lane&&PR[S.lane]?[S.lane]:Object.keys(PR),h='<option value="">Not sure yet, Kevin can recommend</option>';ls.forEach(function(l){var opt=function(p){return '<option value="'+tierStr(l,p)+'">'+p[0]+', from '+p[2]+' &middot; '+p[1]+'</option>'};h+='<optgroup label="'+l+'">'+PR[l].map(opt).join('')+'</optgroup>';(MORE[l]||[]).forEach(function(g){h+='<optgroup label="'+l+': '+g[0]+'">'+g[1].map(opt).join('')+'</optgroup>'})});ft.innerHTML=h;ft.value=S.tier||''}
 $('#f_tier').addEventListener('change',function(){S.tier=this.value;if(this.value){Object.keys(PR).forEach(function(l){if(S.tier.indexOf('(recommended for '+l.toLowerCase()+')')>-1)S.lane=l})}sync()});
 function vibeList(){return S.vibe.map(function(nm){var f=null;for(var i=0;i<V.length;i++)if(V[i][0]===nm){f=V[i];break}return f?f[0]+' \u00b7 '+f[1]+' \u00b7 '+f[2]+', '+f[3]:nm})}
 function vibeSum(){var c={};S.vibe.forEach(function(nm){for(var i=0;i<V.length;i++)if(V[i][0]===nm){[V[i][1],V[i][2],V[i][3]].forEach(function(k){c[k]=(c[k]||0)+1});break}});return Object.keys(c).sort(function(a,b){return c[b]-c[a]}).slice(0,4).map(function(k){return k+' x'+c[k]}).join(', ')}
@@ -727,15 +727,40 @@ function drawW(){
 $('#wmoreb').addEventListener('click',function(){wx=!wx;$('#wgrid2').hidden=!wx;this.textContent=wx?'Show less':'View more'});
 $('#wbook').addEventListener('click',function(){S.lane=wl;sync();go('dates')});
 drawW();
-var PR={'Your day':[['Mezzanine','Solo and spotlight sessions','$2,500','$750','A 3 to 4 minute highlight film','Up to 4 hours of coverage','One filmmaker','Delivered in 3 weeks'],['Skyline','Most events, start to finish','$4,500','$1,350','6 to 8 minute feature film plus a teaser','Up to 8 hours of coverage','Two filmmakers','Toasts and vows audio edit','Delivered in 4 weeks'],['Penthouse','The main event, every chapter and every guest','$7,500','$2,250','Feature film, teaser, and full-event cut','Up to 12 hours across two days','Two filmmakers plus drone','Social cutdowns for sharing','Delivered in 6 weeks']],
-'Brands':[['Mezzanine','Brands just starting on video','$3,000','$3,000','One short brand film per month','Half-day shoot','Cutdowns for social','Monthly strategy call'],['Skyline','Brands posting every week','$6,000','$6,000','Two films per month','Full-day shoot','Cutdowns and vertical edits','Creative direction included'],['Penthouse','Brands that want Kevin on call','$10,000','$10,000','Four films per month','Two shoot days','Priority scheduling','Full creative direction']],
-'Artists + events':[['Mezzanine','One show, one release, one night','$2,000','$600','A 2 to 3 minute performance film','One event, up to 4 hours','Two cameras','Delivered in 2 weeks'],['Skyline','Artists building a full visual world','$5,000','$1,500','Full music video','Concept and shot list','One shoot day','Color grade and delivery'],['Penthouse','Tours, festivals and multi-stop runs','$9,000','$2,700','A series of 4 to 6 films','Multi-day coverage','Travel planning included','Social cutdowns for each stop']]};
+var PR={'Your day':[
+['Small Town Love','Intimate weddings','$4,500','$1,350','2 cinematographers','3 hours of coverage','Multi-camera ceremony setup','Pro audio for vows and officiant','3 to 5 minute highlight film','Digital delivery'],
+['The Grand Romance','The one most couples pick','$7,000','$2,100','2 cinematographers','6 hours of coverage','Multi-camera ceremony and speeches','Full reception moments','1-minute social teaser','5 to 7 minute highlight film','Raw footage add-on available'],
+['The 11th Floor Wedding','Complete cinematic storytelling','$12,000','$3,600','3 cinematographers plus a photographer','8 to 10 hours of coverage','Drone footage, venue and weather permitting','Full ceremony and speeches edits','1-minute teaser plus a 7 to 10 minute wedding film']],
+'Brands':[
+['The Lobby','Quick promo reels, testimonials and lifestyle shots','$550','$165','1 hour at 1 location, yours','Natural or minimal lighting','30 to 60 second reel','Basic color correction','1 revision','Add-ons: rush delivery in 48 hours $75, extra revision $50'],
+['The Elevator Ride','Creators, brands, small businesses and artists','$1,200','$360','1 location, 2 hours','Sound design and licensed music','Color grade','30 to 60 second reel','2 revisions','Add-ons: drone shots $150, scriptwriting and voiceover $125'],
+['Penthouse Floor','Brand campaigns, music artists and high-production visuals','$2,500','$750','1 location, up to 4 hours','Color grade','Sound design and SFX','30 to 60 second hero reel','3 revisions','Add-ons: storyboard and shot list $250, behind-the-scenes mini reel $250, 24-hour turnaround $300']],
+'Artists + events':[
+['The Intro Series','Meetings, small gatherings and simple recaps','$2,500','$750','1 cinematographer','Up to 3 hours','Event coverage, b-roll and moments','1 to 2 minute recap video'],
+['The Executive Series','Conferences, panels and networking events','$4,500','$1,350','1 cinematographer','4 to 6 hours of coverage','Interviews and soundbites','2 to 3 minute recap video','Clean audio recording','Branded title cards and lower thirds'],
+['The Premium Impact Series','High-profile activations and multi-segment content','$7,500','$2,250','2 cinematographers','8 hours of coverage','Full event recap, 7 to 10 minutes','Multiple interview setups','3 to 5 social cutdowns','Drone footage as an optional add-on']]};
+var MORE={'Your day':[['Birthdays, Sweet 16s, baby showers and more',[
+['Welcome to the Party','Smaller celebrations','$2,500','$750','1 cinematographer','3 hours of coverage','Entrance, candle lighting and dancing','1 to 2 minute highlight reel'],
+['Stay for a While','The go-to for most families','$5,200','$1,560','2 cinematographers','5 hours of coverage','Family and friends interviews','3 to 6 minute highlight film','Social media teaser'],
+['The Movie Star','Birthdays and Sweet 16s with full production value','$7,500','$2,250','2 cinematographers plus a photographer','6 to 8 hours of coverage','Full event recap, 5 to 7 minutes','Separate entrance and dance edits','1-minute social cut plus a full edit of the day','Drone footage, venue permitting']]]],
+'Brands':[['Full production',[
+['Skyline Masterpiece','Commercials, artist trailers and high-end campaigns','$4,000+','$1,200','Up to 6 hours','Large lighting package','High-end color grade','SFX, VFX and motion graphics','30 to 60 second campaign reel','Up to 4 revisions','Add-ons are custom: models, locations, props, behind-the-scenes team']]],
+['Podcasts',[
+['Podcast Basic','One-hour taping','$750','$225','Up to 4 angles','1 hour taping','Standard editing','Social media clips'],
+['Podcast Pro','Two-hour taping','$1,400','$420','Up to 4 angles','2 hour taping','Standard editing','Social media clips'],
+['Podcast Premium','Three to four hour taping','$2,300','$690','Up to 4 angles','3 to 4 hour taping','Standard editing','Social media clips']]]],
+'Artists + events':[['Build your own crew: day rates',[
+['Half day','Up to 4 hours','$1,800','$540','Cinematographer $1,800','Second cinematographer or photographer $750','Drone operator $500','Editor $600','Colorist $500','Live stream technician $600'],
+['Full day','Up to 8 hours','$3,200','$960','Cinematographer $3,200','Second cinematographer or photographer $1,350','Drone operator $800','Editor $1,000','Colorist $800','Live stream technician $1,000']]]]};
 var pl='Your day',pf=$('#pf'),tg=$('#tiers');
 Object.keys(PR).forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=k;b.addEventListener('click',function(){pl=k;drawP()});pf.appendChild(b)});
-function drawP(){$$('button',pf).forEach(function(b){b.classList.toggle('on',b.textContent===pl)});tg.innerHTML='';var mo=pl==='Brands';
- PR[pl].forEach(function(p,i){var d=document.createElement('div');d.className='tier'+(i===1?' feat':'');
-  d.innerHTML=(i===1?'<span class="badge">Most booked</span>':'')+'<div class="from">Starting at*</div><h3>'+p[0]+'</h3><p class="for"><span class="rf">Recommended for</span>'+p[1]+'</p><div class="price">'+p[2]+'<small>'+(mo?'estimate, per month*':'starting estimate*')+'</small></div><div class="ret">'+(mo?'Monthly retainer, cancel any month':'Retainer to hold your date: '+p[3])+'</div><ul>'+p.slice(4).map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><button class="btn" type="button">Choose '+p[0]+' &#8599;&#xFE0E;</button>';
-  $('button',d).addEventListener('click',function(){S.tier=tierStr(pl,p);S.lane=pl==='Brands'?'Brands':pl;sync();go('inquiry')});tg.appendChild(d)})}
+function tierCard(p,i,feat){var d=document.createElement('div');d.className='tier'+(feat?' feat':'');
+  d.innerHTML=(feat?'<span class="badge">Most booked</span>':'')+'<div class="from">Starting at*</div><h3>'+p[0]+'</h3><p class="for"><span class="rf">Recommended for</span>'+p[1]+'</p><div class="price">'+p[2]+'<small>starting estimate*</small></div><div class="ret">Retainer to hold your date: '+p[3]+'</div><ul>'+p.slice(4).map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><button class="btn" type="button">Choose '+p[0]+' &#8599;&#xFE0E;</button>';
+  $('button',d).addEventListener('click',function(){S.tier=tierStr(pl,p);S.lane=pl;sync();go('inquiry')});return d}
+function drawP(){$$('button',pf).forEach(function(b){b.classList.toggle('on',b.textContent===pl)});tg.innerHTML='';
+ PR[pl].forEach(function(p,i){tg.appendChild(tierCard(p,i,i===1))});
+ var mx=$('#tiersmore');mx.innerHTML='';
+ (MORE[pl]||[]).forEach(function(g){var h=document.createElement('h4');h.className='xh';h.textContent=g[0];mx.appendChild(h);var gr=document.createElement('div');gr.className='tiers';g[1].forEach(function(p,i){gr.appendChild(tierCard(p,i,false))});mx.appendChild(gr)})}
 drawP();
 drawCal();sync();
 var ft=document.querySelector('footer');if(ft&&fn&&'IntersectionObserver' in window){fn.style.transition='opacity .25s';new IntersectionObserver(function(en){var on=en[0].isIntersecting;fn.style.opacity=on?'0':'';fn.style.pointerEvents=on?'none':''},{threshold:0.05}).observe(ft)}
