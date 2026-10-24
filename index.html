@@ -461,7 +461,7 @@ body.sub .homeonly{display:none}
 
 <section class="view about" id="v-about">
   <div class="wrap sec" style="padding-top:10px">
-    <div class="lab"><span>[ About ]</span><span>Edited from the current site</span></div>
+    <div class="lab"><span>[ About ]</span></div>
     <div class="acard avm"><video src="media/about.mp4" poster="media/about.jpg" muted loop playsinline preload="none"></video><i class="live">PLAYING</i></div>
     <h2>Behind the lens.</h2>
     <div class="abt"><div class="acol"><div class="acard"><video src="media/about.mp4" poster="media/about.jpg" muted loop playsinline preload="none"></video><i class="live">PLAYING</i></div></div><div>
@@ -722,7 +722,7 @@ $('#lbxx').addEventListener('click',closeLb);lbx.addEventListener('click',functi
 function drawW(){
  $$('button',wf).forEach(function(b){b.classList.toggle('on',b.textContent===wl)});
  var base=WO[wl],idx=base+wi,f=F[idx],R=RW[wl]&&RW[wl][wi];
- if(R){wfeat.innerHTML='<div class="rv"><video src="'+R[2]+'.mp4" poster="'+R[2]+'.jpg" controls playsinline preload="none"></video></div><div class="ft"><div class="lab" style="color:var(--mute)"><span>'+wl+'</span><span>'+R[1]+'</span></div><h3 style="font-size:clamp(28px,3.4vw,46px)">'+R[0]+'</h3></div>'}else
+ if(R){wfeat.innerHTML='<div class="rv"><video src="'+R[2]+'.mp4" poster="'+R[2]+'.jpg" controls playsinline preload="none"></video></div><div class="ft"><div class="lab" style="color:var(--mute)"><span>'+wl+'</span></div><h3 style="font-size:clamp(28px,3.4vw,46px)">'+R[0]+'</h3></div>'}else
  wfeat.innerHTML='<button type="button" class="fv" id="fv" style="background:'+grad(idx)+',#0B0B0C;color:'+(f[2]==='light'?'#0B0B0C':'#fff')+'" aria-label="Play '+f[0]+'"><span class="pbtn">'+PLAYSVG+'</span><span class="cap">'+f[0]+'</span><span class="prog"></span></button><div class="ft"><div class="lab" style="color:var(--mute)"><span>'+wl+'</span><span>Case study</span></div><h3>'+f[0]+'</h3><p><b>The brief.</b> [What the client asked for, in a sentence or two.]</p><p><b>The film.</b> [How Kevin shot it and what made it different.]</p><p><b>The result.</b> [What happened after it went live.]</p></div>';
  if(!R)$('#fv').addEventListener('click',function(){var v=$('#fv'),on=v.classList.contains('playing');v.classList.remove('playing');void v.offsetWidth;if(!on)v.classList.add('playing')});
  $('#whead').textContent='[ '+(RW[wl]?RW[wl].length:NH)+' '+(wl==='Your day'?'your day':wl)+' films ]';$('#wcount').textContent=String(wi+1).padStart(2,'0')+' / '+String(RW[wl]?RW[wl].length:NC).padStart(2,'0');
