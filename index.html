@@ -280,6 +280,7 @@ body.sub .homeonly{display:none}
 @keyframes sh{0%,100%{margin-top:0}50%{margin-top:1.5px}}
 @media (prefers-reduced-motion:reduce){.door{transition:none}html{scroll-behavior:auto}.card.playing .prog{animation:none;width:100%}}
 .wm2{height:16px;width:auto;display:block}.cue .wm2{height:22px;margin-top:8px}.cue span:has(.wm2){opacity:1}.lab .eyb{height:15px}@media (max-width:860px){.lab .eyb{height:13px}}.addl{display:block;margin-top:2px}.adds{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.adds button{background:none;color:inherit;border:1.5px solid #ffffff40;border-radius:999px;padding:9px 15px;font:500 14px/1.2 inherit;font-family:inherit;cursor:pointer}.adds button[aria-pressed=true]{background:var(--hot);border-color:var(--hot);color:#fff}.adds button:focus-visible{outline:3px solid #fff;outline-offset:2px}.hero{--hv-black:.45;--hv-dot:.55}.hero .hv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.hero .hov{position:absolute;inset:0;background:#000;opacity:var(--hv-black);z-index:1;pointer-events:none}.hero .glow{z-index:1;opacity:var(--hv-dot)}.card .cv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.card.hasv:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0000 50%,#000b);z-index:1;pointer-events:none}.card.hasv>span{position:relative;z-index:2}.card.hasv .live,.card.hasv .prog{position:absolute;z-index:2}.card.hasv .play{display:none}.card.hasv{justify-content:flex-end}</style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 
@@ -448,6 +449,7 @@ body.sub .homeonly{display:none}
           <div id="f_board" hidden></div>
           <label>Your vision<textarea id="f_msg" placeholder="Two lines about what you want the film to feel like."></textarea></label>
           <div id="ferr" class="note" style="color:#ff6b7d" hidden></div>
+          <div class="cf-turnstile" data-sitekey="0x4AAAAAAFk6OH5jwHHrU4OI" data-theme="dark" style="margin:6px 0 10px"></div>
           <button class="btn hot" type="submit">Send inquiry &#8599;&#xFE0E;</button>
           <div class="note polnote">By sending, you agree to our <button type="button" data-view="policy">usage rights &amp; policies</button>.</div>
         </form>
@@ -701,11 +703,11 @@ $('#form').addEventListener('submit',function(e){
  if(!n||!/^\S+@\S+\.\S+$/.test(em)){er.hidden=false;er.textContent='Add your name and a valid email so Kevin can reply.';return}
  er.hidden=true;
  var sb=$('#form button[type=submit]');sb.disabled=true;sb.textContent='Sending...';
- fetch('https://11ff-inquiries.labelthemuse92.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,lane:S.lane||$('#f_lane').value,date:S.date?S.date.label:'',dateKey:S.date?S.date.key:'',dateEndKey:S.date?S.date.end:'',slot:S.date?S.date.slot:'',location:$('#f_loc').value,budget:'',package:S.tier||'',addons:Array.prototype.map.call(document.querySelectorAll('#f_add [aria-pressed=true]'),function(b){return b.textContent}),vibe:vibeList(),vibeSummary:vibeSum(),vibeFrames:S.vibe.map(function(nm){for(var i=0;i<V.length;i++)if(V[i][0]===nm)return {name:V[i][0],img:V[i][4]};return null}).filter(Boolean),vision:$('#f_msg').value})})
+ fetch('https://11ff-inquiries.labelthemuse92.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,lane:S.lane||$('#f_lane').value,date:S.date?S.date.label:'',dateKey:S.date?S.date.key:'',dateEndKey:S.date?S.date.end:'',slot:S.date?S.date.slot:'',location:$('#f_loc').value,budget:'',package:S.tier||'',addons:Array.prototype.map.call(document.querySelectorAll('#f_add [aria-pressed=true]'),function(b){return b.textContent}),vibe:vibeList(),vibeSummary:vibeSum(),vibeFrames:S.vibe.map(function(nm){for(var i=0;i<V.length;i++)if(V[i][0]===nm)return {name:V[i][0],img:V[i][4]};return null}).filter(Boolean),vision:$('#f_msg').value,turnstile:(document.querySelector('[name=cf-turnstile-response]')||{}).value||''})})
  .then(function(r){return r.json()}).then(function(j){if(!j.ok)throw 0;
  $('#formbox').innerHTML='<div class="thanks"><h3>Got it, '+n.replace(/[<>&]/g,'')+'.</h3><p>Kevin will reply to '+em.replace(/[<>&]/g,'')+' within a day.'+(S.date?' '+S.date.label+' is held for you in the meantime.':'')+(S.vibe.length?' Your vibe board came along with '+S.vibe.length+' frame'+(S.vibe.length>1?'s':'')+'.':'')+'</p></div>';
  })
- .catch(function(){var fe=$('#ferr'),sb=$('#form button[type=submit]');if(sb){sb.disabled=false;sb.innerHTML='Send inquiry &#8599;&#xFE0E;'}fe.textContent='That did not go through. Please try again, or email Kevin at 11thfloorfilms@gmail.com.';fe.hidden=false;});
+ .catch(function(){var fe=$('#ferr'),sb=$('#form button[type=submit]');if(sb){sb.disabled=false;sb.innerHTML='Send inquiry &#8599;&#xFE0E;'}if(window.turnstile)try{turnstile.reset()}catch(x){}fe.textContent='That did not go through. Please try again, or email Kevin at 11thfloorfilms@gmail.com.';fe.hidden=false;});
 });
 /* ---------- work + about ---------- */
 var WL=['Your day','Brands','Artists','Events','Community + Education'],WO={'Your day':0,'Brands':15,'Artists':30,'Events':30,'Community + Education':0},WN={'Your day':28,'Brands':28,'Artists':28,'Events':28,'Community + Education':28},wl='Your day',wi=0,wx=false,wf=$('#wf'),wfeat=$('#feat'),NH=8,PLAYSVG='<svg width="30" height="30" viewBox="0 0 24 24" fill="#fff"><path d="M7 4l13 8-13 8z"/></svg>';
