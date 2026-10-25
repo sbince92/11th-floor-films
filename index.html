@@ -441,7 +441,7 @@ body.sub .homeonly{display:none}
       <div id="formbox">
         <form id="form" novalidate>
           <div class="row2"><label>Name<input id="f_name" autocomplete="name" required></label><label>Email<input id="f_email" type="email" autocomplete="email" required></label></div>
-          <div class="row2"><label>Project<select id="f_lane"><option value="">Choose a lane</option><option>Your day</option><option>Brands</option><option>Artists + events</option></select></label><label>Location<input id="f_loc" placeholder="City or venue"></label></div>
+          <div class="row2"><label>Project<select id="f_lane"><option value="">Choose a lane</option><option>Your day</option><option>Brands</option><option value="Artists + events">Artists</option></select></label><label>Location<input id="f_loc" placeholder="City or venue"></label></div>
           <div class="row2"><label>Date<input id="f_date" readonly placeholder="Pick one above"></label><label>Package<select id="f_tier"><option value="">Not sure yet, Kevin can recommend</option></select></label></div>
           
           <details class="addl"><summary style="cursor:pointer;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)">Add-ons (optional)</summary><div class="adds" id="f_add"><button type="button" aria-pressed="false">Out-of-state travel</button><button type="button" aria-pressed="false">Drone footage</button><button type="button" aria-pressed="false">Second shooter</button><button type="button" aria-pressed="false">Rush delivery</button><button type="button" aria-pressed="false">Social cuts</button><button type="button" aria-pressed="false">Extra edit round</button><button type="button" aria-pressed="false">Raw footage</button></div><div class="note" style="margin-top:8px">Tick anything you want added. No prices here: Kevin includes them in your estimate.</div></details>
@@ -581,7 +581,7 @@ var rd=$('#rdots');for(var di=0;di<3;di++)(function(i){var b=document.createElem
 function rdUpd(){var m=rr.scrollWidth-rr.clientWidth;rd.style.display=m>8?'flex':'none';var p=m>0?rr.scrollLeft/m:0,a=p<.34?0:p<.67?1:2;$$('button',rd).forEach(function(b,i){b.classList.toggle('on',i===a)})}
 rr.addEventListener('scroll',rdUpd,{passive:true});addEventListener('resize',rdUpd);rdUpd();
 /* ---------- lanes ---------- */
-var lanes=[['Your day','Weddings, birthdays, the day you only get once','Your day'],['Brands','Campaigns with a point of view','Brands'],['Artists + events','Stages, tours, big nights','Artists + events']];
+var lanes=[['Your day','Weddings, birthdays, the day you only get once','Your day'],['Brands','Campaigns with a point of view','Brands'],['Artists','Stages, tours, big nights','Artists + events']];
 var ll=$('#lanelist'),ARW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M8 7h9v9"/></svg>';
 lanes.forEach(function(l){var b=document.createElement('button');b.className='lane';b.type='button';b.innerHTML='<span><div class="n">'+l[0]+'</div><div class="d">'+l[1]+'</div></span>'+ARW;b.addEventListener('click',function(){S.lane=l[2];sync();openWork(l[2])});ll.appendChild(b)});
 /* ---------- calendar ---------- */
@@ -689,7 +689,7 @@ function sync(){
  var cs=$$('#lanelist .lane');lanes.forEach(function(l,i){cs[i].classList.toggle('sel',S.lane===l[2])});
 }
 $('#f_lane').addEventListener('change',function(){S.lane=this.value;sync()});
-function LB(l){return l==='Brands'?'Reels':l}
+function LB(l){return l==='Brands'?'Reels':l==='Artists + events'?'Artists':l}
 function tierStr(l,p){return p[0]+' (recommended for '+LB(l).toLowerCase()+')'+(p[2]?' starting at '+p[2]:' (priced at consultation)')}
 function buildTierSel(){var ft=$('#f_tier');if(!ft||typeof PR==='undefined')return;var ls=S.lane&&PR[S.lane]?[S.lane]:Object.keys(PR),h='<option value="">Not sure yet, Kevin can recommend</option>';ls.forEach(function(l){var opt=function(p){return '<option value="'+tierStr(l,p)+'">'+p[0]+(p[2]?', from '+p[2]:'')+' &middot; '+p[1]+'</option>'};h+='<optgroup label="'+LB(l)+'">'+PR[l].map(opt).join('')+'</optgroup>';(MORE[l]||[]).forEach(function(g){h+='<optgroup label="'+LB(l)+': '+g[0]+'">'+g[1].map(opt).join('')+'</optgroup>'})});ft.innerHTML=h;ft.value=S.tier||''}
 $('#f_tier').addEventListener('change',function(){S.tier=this.value;if(this.value){Object.keys(PR).forEach(function(l){if(S.tier.indexOf('(recommended for '+LB(l).toLowerCase()+')')>-1)S.lane=l})}sync()});
