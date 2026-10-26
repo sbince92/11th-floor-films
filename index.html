@@ -681,7 +681,7 @@ $('#qp').addEventListener('click',function(){qi=(qi+qs.length-1)%qs.length;drawQ
 function sync(){
  renderVibeBar();
  var sd=$('#s_date');sd.textContent=S.date?S.date.label:'Not picked yet';sd.className=S.date?'':'empty';
- var sl=$('#s_lane');sl.textContent=S.lane||'Not picked yet';sl.className=S.lane?'':'empty';
+ var sl=$('#s_lane');sl.textContent=S.lane?LB(S.lane):'Not picked yet';sl.className=S.lane?'':'empty';
  var sv=$('#s_vibe'),th=saved.map(function(i){return '<i title="'+V[i][0]+'" style="background:'+vgrad(i)+'"></i>'}).join('');sv.innerHTML=saved.length?'<div class="thumbs">'+th+'</div><div style="margin-top:8px;font-size:14px">'+saved.length+' of 11 frames attached</div>':'No frames saved';sv.className=saved.length?'':'empty';
  var vb=$('#vbtn');if(vb)vb.innerHTML=saved.length?'Edit your vibe board ('+saved.length+' saved) &#8599;&#xFE0E;':'Don\'t forget your vibe board &#8599;&#xFE0E;';
  var fb=$('#f_board');fb.hidden=!saved.length;fb.innerHTML=saved.length?'<div class="thumbs">'+th+'</div><small>Your board ('+saved.length+' of 11) goes to Kevin with this inquiry.</small>':'';
@@ -693,8 +693,8 @@ function sync(){
 $('#f_lane').addEventListener('change',function(){S.lane=this.value;sync()});
 function DL(l){return l==='Your day'?'Events':l==='Artists + events'?'Artists':l}function LB(l){return l==='Brands'?'Reels':DL(l)}
 function tierStr(l,p){return p[0]+' (recommended for '+LB(l).toLowerCase()+')'+(p[2]?' starting at '+p[2]:' (priced at consultation)')}
-function buildTierSel(){var ft=$('#f_tier');if(!ft||typeof PR==='undefined')return;var ls=S.lane&&PR[S.lane]?[S.lane]:Object.keys(PR),h='<option value="">Not sure yet, Kevin can recommend</option>';ls.forEach(function(l){var opt=function(p){return '<option value="'+tierStr(l,p)+'">'+p[0]+(p[2]?', from '+p[2]:'')+' &middot; '+p[1]+'</option>'};h+='<optgroup label="'+LB(l)+'">'+PR[l].map(opt).join('')+'</optgroup>';(MORE[l]||[]).forEach(function(g){h+='<optgroup label="'+LB(l)+': '+g[0]+'">'+g[1].map(opt).join('')+'</optgroup>'})});ft.innerHTML=h;ft.value=S.tier||''}
-$('#f_tier').addEventListener('change',function(){S.tier=this.value;if(this.value){Object.keys(PR).forEach(function(l){if(S.tier.indexOf('(recommended for '+LB(l).toLowerCase()+')')>-1)S.lane=l})}sync()});
+function buildTierSel(){var ft=$('#f_tier');if(!ft||typeof PR==='undefined')return;var ls=S.lane?Object.keys(PR).filter(function(k){return LANE[k]===S.lane}):Object.keys(PR);if(!ls.length)ls=Object.keys(PR);var h='<option value="">Not sure yet, Kevin can recommend</option>';ls.forEach(function(l){var opt=function(p){return '<option value="'+tierStr(l,p)+'">'+p[0]+(p[2]?', from '+p[2]:'')+' &middot; '+p[1]+'</option>'};h+='<optgroup label="'+LB(l)+'">'+PR[l].map(opt).join('')+'</optgroup>';(MORE[l]||[]).forEach(function(g){h+='<optgroup label="'+LB(l)+': '+g[0]+'">'+g[1].map(opt).join('')+'</optgroup>'})});ft.innerHTML=h;ft.value=S.tier||''}
+$('#f_tier').addEventListener('change',function(){S.tier=this.value;if(this.value){Object.keys(PR).forEach(function(l){if(S.tier.indexOf('(recommended for '+LB(l).toLowerCase()+')')>-1)S.lane=LANE[l]})}sync()});
 function vibeList(){return S.vibe.map(function(nm){var f=null;for(var i=0;i<V.length;i++)if(V[i][0]===nm){f=V[i];break}return f?f[0]+' \u00b7 '+f[1]+' \u00b7 '+f[2]+', '+f[3]:nm})}
 function vibeSum(){var c={};S.vibe.forEach(function(nm){for(var i=0;i<V.length;i++)if(V[i][0]===nm){[V[i][1],V[i][2],V[i][3]].forEach(function(k){c[k]=(c[k]||0)+1});break}});return Object.keys(c).sort(function(a,b){return c[b]-c[a]}).slice(0,4).map(function(k){return k+' x'+c[k]}).join(', ')}
 $('#f_add').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true')});
@@ -733,6 +733,7 @@ function drawW(){
 $('#wmoreb').addEventListener('click',function(){wx=!wx;$('#wgrid2').hidden=!wx;this.textContent=wx?'Show less':'View more'});
 $('#wbook').addEventListener('click',function(){S.lane=wl==='Community + Education'?'':(wl==='Artists'||wl==='Events')?'Artists + events':wl;sync();go('dates')});
 drawW();
+var LANE={'Brands':'Brands','Podcasts':'Brands','Artists':'Artists + events','Events':'Your day','Weddings':'Your day'},NOFEAT={'Podcasts':1,'Artists':1};
 var PR={'Your day':[
 ['Small Town Love','Intimate weddings',null,null,'2 cinematographers','3 hours of coverage','Multi-camera ceremony setup','Pro audio for vows and officiant','3 to 5 minute highlight film','Digital delivery'],
 ['The Grand Romance','The one most couples pick',null,null,'2 cinematographers','6 hours of coverage','Multi-camera ceremony and speeches','Full reception moments','1-minute social teaser','5 to 7 minute highlight film','Raw footage add-on available'],
@@ -759,14 +760,17 @@ var MORE={'Your day':[['Birthdays, Sweet 16s, baby showers and more',[
 'Artists + events':[['Day rates and crew add-ons',[
 ['Half day','Up to 4 hours, one cinematographer','$1,800','$540','Included: cinematographer, up to 4 hours','Add-ons, priced separately and added on top of the rate above:','Second cinematographer or photographer +$750','Drone operator +$500','Editor +$600','Colorist +$500','Live stream technician +$600'],
 ['Full day','Up to 8 hours, one cinematographer','$3,200','$960','Included: cinematographer, up to 8 hours','Add-ons, priced separately and added on top of the rate above:','Second cinematographer or photographer +$1,350','Drone operator +$800','Editor +$1,000','Colorist +$800','Live stream technician +$1,000']]]]};
-PR={'Brands':PR['Brands'],'Artists + events':PR['Artists + events'],'Your day':PR['Your day']};
+(function(){var W=PR['Your day'],B=PR['Brands'],AE=PR['Artists + events'],M=MORE,cel=M['Your day'][0],full=M['Brands'][0],pod=M['Brands'][1],day=M['Artists + events'][0];
+NOTE={'Brands':NOTE['Brands'],'Weddings':NOTE['Your day']};
+PR={'Brands':B,'Podcasts':pod[1],'Artists':full[1],'Events':AE,'Weddings':W};
+MORE={'Brands':[full],'Artists':[day],'Events':[cel]};})();
 var pl='Brands',pf=$('#pf'),tg=$('#tiers');
 Object.keys(PR).forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=LB(k);b.setAttribute('data-k',k);b.addEventListener('click',function(){pl=k;drawP()});pf.appendChild(b)});
 function tierCard(p,i,feat){var d=document.createElement('div');d.className='tier'+(feat?' feat':'');
   var np=!p[2];d.innerHTML=(feat?'<span class="badge">Most booked</span>':'')+'<div class="from">'+(np?'Custom quote':'Starting at*')+'</div><h3>'+p[0]+'</h3><p class="for"><span class="rf">Recommended for</span>'+p[1]+'</p>'+(np?'<div class="price"><span style="font-size:.46em;line-height:1;display:block">Priced after your consultation</span></div><div class="ret">Retainer set when we talk</div>':'<div class="price">'+p[2]+'<small>starting estimate*</small></div><div class="ret">Retainer to hold your date: '+p[3]+'</div>')+'<ul>'+p.slice(4).map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><button class="btn" type="button">'+(np?'Book a consultation':'Choose '+p[0])+' &#8599;&#xFE0E;</button>';
-  $('button',d).addEventListener('click',function(){S.tier=tierStr(pl,p);S.lane=pl;sync();go('inquiry')});return d}
+  $('button',d).addEventListener('click',function(){S.tier=tierStr(pl,p);S.lane=LANE[pl];sync();go('inquiry')});return d}
 function drawP(){$$('button',pf).forEach(function(b){b.classList.toggle('on',b.getAttribute('data-k')===pl)});tg.innerHTML='';
- PR[pl].forEach(function(p,i){tg.appendChild(tierCard(p,i,i===1))});
+ PR[pl].forEach(function(p,i){tg.appendChild(tierCard(p,i,i===1&&!NOFEAT[pl]))});
  var mx=$('#tiersmore');mx.innerHTML='';if(NOTE[pl]){var nt=document.createElement('p');nt.className='fine';nt.style.marginTop='18px';nt.textContent=NOTE[pl];mx.appendChild(nt)}
  (MORE[pl]||[]).forEach(function(g){var h=document.createElement('h4');h.className='xh';h.textContent=g[0];mx.appendChild(h);var gr=document.createElement('div');gr.className='tiers';g[1].forEach(function(p,i){gr.appendChild(tierCard(p,i,false))});mx.appendChild(gr)})}
 drawP();
