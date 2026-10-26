@@ -762,8 +762,8 @@ var MORE={'Your day':[['Birthdays, Sweet 16s, baby showers and more',[
 ['Full day','Up to 8 hours, one cinematographer','$3,200','$960','Included: cinematographer, up to 8 hours','Add-ons, priced separately and added on top of the rate above:','Second cinematographer or photographer +$1,350','Drone operator +$800','Editor +$1,000','Colorist +$800','Live stream technician +$1,000']]]]};
 (function(){var W=PR['Your day'],B=PR['Brands'],AE=PR['Artists + events'],M=MORE,cel=M['Your day'][0],full=M['Brands'][0],pod=M['Brands'][1],day=M['Artists + events'][0];
 NOTE={'Brands':NOTE['Brands'],'Weddings':NOTE['Your day']};
-PR={'Brands':B,'Podcasts':pod[1],'Artists':full[1],'Events':AE,'Weddings':W};
-MORE={'Brands':[full],'Artists':[day],'Events':[cel]};})();
+PR={'Brands':B,'Podcasts':pod[1],'Artists':full[1].concat(day[1]),'Events':AE,'Weddings':W};
+MORE={'Brands':[full],'Events':[cel]};})();
 var pl='Brands',pf=$('#pf'),tg=$('#tiers');
 Object.keys(PR).forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=LB(k);b.setAttribute('data-k',k);b.addEventListener('click',function(){pl=k;drawP()});pf.appendChild(b)});
 function tierCard(p,i,feat){var d=document.createElement('div');d.className='tier'+(feat?' feat':'');
