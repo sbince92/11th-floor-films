@@ -220,6 +220,15 @@ body.sub .homeonly{display:none}
 @media (max-width:860px){.abt{display:flex;flex-direction:column}.abt>div:last-child{display:flex;flex-direction:column}.acol .acard{display:none}.avm{display:block;width:min(100%,420px);max-height:80svh;margin:6px auto 22px}}
 @media (max-width:860px){.abt{grid-template-columns:1fr;gap:26px}}
 /* pricing */
+.addons{background:var(--shadow);border-radius:8px;margin-top:14px;padding:6px 24px}
+.addons summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+.addons summary::-webkit-details-marker{display:none}
+.addons summary small{opacity:.7;letter-spacing:.06em;text-transform:none;font-size:13px}
+.addons summary:after{content:'\25BE';font-size:14px;transition:transform .2s}.addons[open] summary:after{transform:rotate(180deg)}
+.addons label{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid #ffffff22;cursor:pointer;font:400 16px var(--body);text-transform:none;letter-spacing:0;color:#fff}
+.addons input{width:20px;height:20px;accent-color:var(--hot);flex:none}
+.addons label span:last-child{margin-left:auto;opacity:.8;font-size:14px;white-space:nowrap}
+.addons .tot{border-top:1px solid #ffffff22;padding:14px 0 16px;font-size:14px;opacity:.9}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
 @media (max-width:860px){.tiers{grid-template-columns:1fr}}
 .tier{background:var(--shadow);border-radius:8px;padding:24px;display:flex;flex-direction:column;gap:14px;position:relative}
@@ -445,7 +454,7 @@ body.sub .homeonly{display:none}
           <div class="row2"><label>Project<select id="f_lane"><option value="">Choose a lane</option><option value="Your day">Events</option><option>Brands</option><option value="Artists + events">Artists</option></select></label><label>Location<input id="f_loc" placeholder="City or venue"></label></div>
           <div class="row2"><label>Date<input id="f_date" readonly placeholder="Pick one above"></label><label>Package<select id="f_tier"><option value="">Not sure yet, Kevin can recommend</option></select></label></div>
           
-          <details class="addl"><summary style="cursor:pointer;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)">Add-ons (optional)</summary><div class="adds" id="f_add"><button type="button" aria-pressed="false">Out-of-state travel</button><button type="button" aria-pressed="false">Drone footage</button><button type="button" aria-pressed="false">Second shooter</button><button type="button" aria-pressed="false">Rush delivery</button><button type="button" aria-pressed="false">Social cuts</button><button type="button" aria-pressed="false">Extra edit round</button><button type="button" aria-pressed="false">Raw footage</button></div><div class="note" style="margin-top:8px">Tick anything you want added. No prices here: Kevin includes them in your estimate.</div></details>
+          <details class="addl"><summary style="cursor:pointer;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)">Add-ons (optional)</summary><div class="adds" id="f_add"><button type="button" aria-pressed="false">Out-of-state travel</button><button type="button" aria-pressed="false">Drone footage</button><button type="button" aria-pressed="false">Second shooter</button><button type="button" aria-pressed="false">Rush delivery</button><button type="button" aria-pressed="false">Social cuts</button><button type="button" aria-pressed="false">Extra edit round</button><button type="button" aria-pressed="false">Raw footage</button></div><div class="note" style="margin-top:8px">Tick anything you want added. Kevin includes the prices in your estimate.</div></details>
           <div id="f_board" hidden></div>
           <label>Your vision<textarea id="f_msg" placeholder="Two lines about what you want the film to feel like."></textarea></label>
           <div id="ferr" class="note" style="color:#ff6b7d" hidden></div>
@@ -468,7 +477,7 @@ body.sub .homeonly{display:none}
       <h2 style="font-size:clamp(44px,8vw,96px);margin:16px 0 14px;max-width:24ch">Get an estimate. Endless possibilities.</h2>
       <p style="max-width:56ch;margin:0 0 22px">Pick your lane, get an estimate, and hold your date with a retainer. If your project sits between tiers, the inquiry form is the place to say so.</p>
       <div class="fchips" id="pf"></div>
-      <div class="tiers" id="tiers"></div><div id="tiersmore"></div>
+      <div class="tiers" id="tiers"></div><div id="tiersmore"></div><details class="addons" id="addons" open></details>
       <p class="fine"><b>*</b> Estimates, not final prices. Every film is built around your story, so your exact number is set after we talk it through together.</p>
       <div class="always"><span class="chip">Retainer holds your date</span><span class="chip">Balance due before the shoot</span><span class="chip">Raw footage on request</span><span class="chip">Revisions included</span></div>
     </div>
@@ -542,7 +551,7 @@ if(seen){busy=true;op.classList.add('gone')}else{html.classList.add('lock');T(ru
 $('#replay').addEventListener('click',function(){
  showView('home');timers.forEach(clearTimeout);op.classList.remove('gone','open','closed','shake');lob.style.visibility='visible';lob.classList.remove('pressed');fl.textContent='1';busy=false;html.classList.add('lock');window.scrollTo(0,0);T(run,900)});
 /* ---------- shared state ---------- */
-var S={lane:'',date:null,vibe:[],tier:''};
+var S={lane:'',date:null,vibe:[],tier:'',adds:[]};
 var STRIPE=['#0B0B0C','#1E1E21','#C8102E','#fff','#C8102E','#fff','#C8102E'];
 $$('[data-stripe]').forEach(function(s){s.innerHTML=STRIPE.map(function(c){return '<i style="background:'+c+'"></i>'}).join('')});
 /* ---------- views / nav ---------- */
@@ -701,7 +710,7 @@ function buildTierSel(){var ft=$('#f_tier');if(!ft||typeof PR==='undefined')retu
 $('#f_tier').addEventListener('change',function(){S.tier=this.value;if(this.value){Object.keys(PR).forEach(function(l){if(S.tier.indexOf('(recommended for '+LB(l).toLowerCase()+')')>-1)S.lane=LANE[l]})}sync()});
 function vibeList(){return S.vibe.map(function(nm){var f=null;for(var i=0;i<V.length;i++)if(V[i][0]===nm){f=V[i];break}return f?f[0]+' \u00b7 '+f[1]+' \u00b7 '+f[2]+', '+f[3]:nm})}
 function vibeSum(){var c={};S.vibe.forEach(function(nm){for(var i=0;i<V.length;i++)if(V[i][0]===nm){[V[i][1],V[i][2],V[i][3]].forEach(function(k){c[k]=(c[k]||0)+1});break}});return Object.keys(c).sort(function(a,b){return c[b]-c[a]}).slice(0,4).map(function(k){return k+' x'+c[k]}).join(', ')}
-$('#f_add').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true')});
+$('#f_add').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;setAdd(b.textContent,b.getAttribute('aria-pressed')!=='true')});
 $('#form').addEventListener('submit',function(e){
  e.preventDefault();var n=$('#f_name').value.trim(),em=$('#f_email').value.trim(),er=$('#ferr');
  if(!n||!/^\S+@\S+\.\S+$/.test(em)){er.hidden=false;er.textContent='Add your name and a valid email so Kevin can reply.';return}
@@ -743,9 +752,9 @@ var PR={'Your day':[
 ['The Grand Romance','The one most couples pick',null,null,'2 cinematographers','6 hours of coverage','Multi-camera ceremony and speeches','Full reception moments','1-minute social teaser','5 to 7 minute highlight film','Raw footage add-on available'],
 ['The 11th Floor Wedding','Complete cinematic storytelling',null,null,'3 cinematographers plus a photographer','8 to 10 hours of coverage','Drone footage, venue and weather permitting','Full ceremony and speeches edits','1-minute teaser plus a 7 to 10 minute wedding film']],
 'Brands':[
-['The Lobby','Quick promo reels, testimonials and lifestyle shots','$550','$165','1 hour at 1 location, yours','Natural or minimal lighting','30 to 60 second reel','Basic color correction','1 revision','Add-ons: rush delivery in 48 hours $75, extra revision $50'],
-['The Elevator Ride','Creators, small businesses and artists','$1,200','$360','1 location, 2 hours','Sound design and licensed music','Color grade','30 to 60 second reel','2 revisions','Add-ons: drone shots $150, scriptwriting and voiceover $125'],
-['Penthouse Floor','Music artists, creators and high-production visuals','$2,500','$750','1 location, up to 4 hours','Color grade','Sound design and SFX','30 to 60 second hero reel','3 revisions','Add-ons: storyboard and shot list $250, behind-the-scenes mini reel $250, 24-hour turnaround $300']],
+['The Lobby','Creators and straightforward content needs','$650','$195','Up to 1 hour \u00b7 1 location (client provided)','One 30 to 60 second reel','Cinematic capture with natural or minimal lighting','Color correction and sound design','One revision'],
+['The Elevator Ride','Businesses, artists, athletes and personal brands','$1,000','$300','Up to 2 hours \u00b7 1 location','One 60 to 90 second reel','More coverage and shot variety','Color correction and sound design','One revision'],
+['The Campaign Floor','Brands and clients seeking a polished commercial-style production','$1,500','$450','Up to 3 hours \u00b7 1 location','One 90 to 120 second hero reel','Pre-production and creative shot planning','Intentional lighting and premium color grade','Enhanced sound design and music synchronization','One revision']],
 'Artists + events':[
 ['The Intro Series','Meetings, small gatherings and simple recaps','$2,500','$750','1 cinematographer','Up to 3 hours','Event coverage, b-roll and moments','1 to 2 minute recap video'],
 ['The Executive Series','Conferences, panels and networking events','$4,500','$1,350','1 cinematographer','4 to 6 hours of coverage','Interviews and soundbites','2 to 3 minute recap video','Clean audio recording','Branded title cards and lower thirds'],
@@ -767,7 +776,14 @@ var MORE={'Your day':[['Birthdays, Sweet 16s, baby showers and more',[
 (function(){var W=PR['Your day'],B=PR['Brands'],AE=PR['Artists + events'],M=MORE,cel=M['Your day'][0],full=M['Brands'][0],pod=M['Brands'][1],day=M['Artists + events'][0];
 NOTE={'Brands':NOTE['Brands'],'Weddings':NOTE['Your day']};
 PR={'Brands':B,'Podcasts':pod[1],'Artists':full[1].concat(day[1]),'Events':AE,'Weddings':W};
-MORE={'Brands':[full],'Events':[cel]};})();
+MORE={'Events':[cel]};})();
+var ADD=[['Drone shots',150],['Photos',0],['24 hour turnaround',300],['48 hour turnaround',75],['Extra revision',50],['Creative direction',0]];
+function addTot(){var t=0,q=0;S.adds.forEach(function(n){ADD.forEach(function(a){if(a[0]===n){if(a[1])t+=a[1];else q++}})});return {t:t,q:q}}
+function setAdd(n,on){var i=S.adds.indexOf(n);if(on&&i<0)S.adds.push(n);if(!on&&i>-1)S.adds.splice(i,1);drawAdds();drawFormAdds()}
+function drawAdds(){var d=$('#addons');if(!d)return;var o=d.open,k=addTot(),m=function(n){return '$'+n.toLocaleString('en-US')};
+ d.innerHTML='<summary><span>Add-ons</span><small>'+(S.adds.length?S.adds.length+' picked':'Tick any you want')+'</small></summary>'+ADD.map(function(a){return '<label><input type="checkbox" data-n="'+a[0]+'"'+(S.adds.indexOf(a[0])>-1?' checked':'')+'><span>'+a[0]+'</span><span>'+(a[1]?'+'+m(a[1]):'Quoted for you')+'</span></label>'}).join('')+(S.adds.length?'<div class="tot">Add-ons: '+(k.t?'+'+m(k.t):'$0')+(k.q?' plus '+k.q+' quoted by Kevin':'')+'. Included in your inquiry.</div>':'');
+ d.open=o;$$('input',d).forEach(function(c){c.addEventListener('change',function(){setAdd(c.getAttribute('data-n'),c.checked)})})}
+function drawFormAdds(){var f=$('#f_add');if(!f)return;f.innerHTML=ADD.map(function(a){return '<button type="button" aria-pressed="'+(S.adds.indexOf(a[0])>-1)+'">'+a[0]+'</button>'}).join('')}
 var pl='Brands',pf=$('#pf'),tg=$('#tiers');
 Object.keys(PR).forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=LB(k);b.setAttribute('data-k',k);b.addEventListener('click',function(){pl=k;drawP()});pf.appendChild(b)});
 function tierCard(p,i,feat){var d=document.createElement('div');d.className='tier'+(feat?' feat':'');
@@ -777,7 +793,7 @@ function drawP(){$$('button',pf).forEach(function(b){b.classList.toggle('on',b.g
  PR[pl].forEach(function(p,i){tg.appendChild(tierCard(p,i,i===1&&!NOFEAT[pl]))});
  var mx=$('#tiersmore');mx.innerHTML='';if(NOTE[pl]){var nt=document.createElement('p');nt.className='fine';nt.style.marginTop='18px';nt.textContent=NOTE[pl];mx.appendChild(nt)}
  (MORE[pl]||[]).forEach(function(g){var h=document.createElement('h4');h.className='xh';h.textContent=g[0];mx.appendChild(h);var gr=document.createElement('div');gr.className='tiers';g[1].forEach(function(p,i){gr.appendChild(tierCard(p,i,false))});mx.appendChild(gr)})}
-drawP();
+drawP();drawAdds();drawFormAdds();
 drawCal();sync();
 var ft=document.querySelector('footer');if(ft&&fn&&'IntersectionObserver' in window){fn.style.transition='opacity .25s';new IntersectionObserver(function(en){var on=en[0].isIntersecting;fn.style.opacity=on?'0':'';fn.style.pointerEvents=on?'none':''},{threshold:0.05}).observe(ft)}
 var hh=(location.hash||'').slice(1);if(['work','pricing','about','policy','inquiry'].indexOf(hh)>-1){timers.forEach(clearTimeout);timers=[];busy=true;op.classList.add('gone');lob.style.visibility='hidden';html.classList.remove('lock');showView(hh)}
