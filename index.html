@@ -777,7 +777,7 @@ var MORE={'Your day':[['Birthdays, Sweet 16s, baby showers and more',[
 NOTE={'Brands':NOTE['Brands'],'Weddings':NOTE['Your day']};
 PR={'Brands':B,'Podcasts':pod[1],'Artists':full[1].concat(day[1]),'Events':AE,'Weddings':W};
 MORE={'Events':[cel]};})();
-var ADD=[['Drone shots',200,'Aerial establishing shots, subject to location and flight restrictions'],['Photos',200,'10 professionally edited photos from the same shoot'],['24 hour turnaround',250,'Priority editing and delivery within 24 hours of the shoot'],['48 hour turnaround',125,'Priority editing and delivery within 48 hours'],['Extra revision',75,'One more round of edits beyond the included revision'],['Creative direction',0,'Concept and shot planning with Kevin']];
+var ADD=[['Drone shots',200,'Aerial establishing shots, subject to location and flight restrictions'],['Photos',200,'10 professionally edited photos from the same shoot'],['24 hour turnaround',250,'Priority editing and delivery within 24 hours of the shoot'],['48 hour turnaround',125,'Priority editing and delivery within 48 hours'],['Extra revision',75,'One more round of edits beyond the included revision']];
 function addTot(){var t=0,q=0;S.adds.forEach(function(n){ADD.forEach(function(a){if(a[0]===n){if(a[1])t+=a[1];else q++}})});return {t:t,q:q}}
 function setAdd(n,on){if(on&&/ turnaround$/.test(n)){S.adds=S.adds.filter(function(x){return !/ turnaround$/.test(x)||x===n})}var i=S.adds.indexOf(n);if(on&&i<0)S.adds.push(n);if(!on&&i>-1)S.adds.splice(i,1);drawAdds();drawFormAdds()}
 function drawAdds(){var d=$('#addons');if(!d)return;var o=d.open,k=addTot(),m=function(n){return '$'+n.toLocaleString('en-US')};
