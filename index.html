@@ -752,7 +752,7 @@ var PR={'Your day':[
 ['The Grand Romance','The one most couples pick',null,null,'2 cinematographers','6 hours of coverage','Multi-camera ceremony and speeches','Full reception moments','1-minute social teaser','5 to 7 minute highlight film','Raw footage add-on available'],
 ['The 11th Floor Wedding','Complete cinematic storytelling',null,null,'3 cinematographers plus a photographer','8 to 10 hours of coverage','Drone footage, venue and weather permitting','Full ceremony and speeches edits','1-minute teaser plus a 7 to 10 minute wedding film']],
 'Brands':[
-['The Lobby','Creators and straightforward content needs','$650','$195','Up to 1 hour \u00b7 1 location (client provided)','One 30 to 60 second reel','Cinematic capture with natural or minimal lighting','Color correction and sound design','One revision'],
+['The Lobby','Creators and straightforward content needs','$650','$250','Up to 1 hour \u00b7 1 location (client provided)','One 30 to 60 second reel','Cinematic capture with natural or minimal lighting','Color correction and sound design','One revision'],
 ['The Elevator Ride','Businesses, artists, athletes and personal brands','$1,000','$300','Up to 2 hours \u00b7 1 location','One 60 to 90 second reel','More coverage and shot variety','Color correction and sound design','One revision'],
 ['The Campaign Floor','Brands and clients seeking a polished commercial-style production','$1,500','$450','Up to 3 hours \u00b7 1 location','One 90 to 120 second hero reel','Pre-production and creative shot planning','Intentional lighting and premium color grade','Enhanced sound design and music synchronization','One revision']],
 'Artists + events':[
@@ -767,7 +767,7 @@ var MORE={'Your day':[['Birthdays, Sweet 16s, baby showers and more',[
 'Brands':[['Full production',[
 ['Skyline Masterpiece','Artist trailers and high-production reels','$4,000+','$1,200','Up to 6 hours','Large lighting package','High-end color grade','SFX, VFX and motion graphics','30 to 60 second campaign reel','Up to 4 revisions','Add-ons are custom: models, locations, props, behind-the-scenes team']]],
 ['Podcasts',[
-['Podcast Basic','One-hour taping','$750','$225','Up to 4 angles','1 hour taping','Standard editing','Social media clips'],
+['Podcast Basic','One-hour taping','$750','$250','Up to 4 angles','1 hour taping','Standard editing','Social media clips'],
 ['Podcast Pro','Two-hour taping','$1,400','$420','Up to 4 angles','2 hour taping','Standard editing','Social media clips'],
 ['Podcast Premium','Three to four hour taping','$2,300','$690','Up to 4 angles','3 to 4 hour taping','Standard editing','Social media clips']]]],
 'Artists + events':[['Day rates and crew add-ons',[
@@ -786,7 +786,7 @@ function drawAdds(){var d=$('#addons');if(!d)return;var o=d.open,k=addTot(),m=fu
 function drawFormAdds(){var f=$('#f_add');if(!f)return;f.innerHTML=ADD.map(function(a){return '<button type="button" aria-pressed="'+(S.adds.indexOf(a[0])>-1)+'">'+a[0]+'</button>'}).join('')}
 var pl='Brands',pf=$('#pf'),tg=$('#tiers');
 Object.keys(PR).forEach(function(k){var b=document.createElement('button');b.type='button';b.textContent=LB(k);b.setAttribute('data-k',k);b.addEventListener('click',function(){pl=k;drawP()});pf.appendChild(b)});
-function tierCard(p,i,feat){var d=document.createElement('div');d.className='tier'+(feat?' feat':'');
+function tierCard(p,i,feat){if(p[3]&&+String(p[3]).replace(/[^\d]/g,'')<250)p=p.slice(0,3).concat(['$250'],p.slice(4));var d=document.createElement('div');d.className='tier'+(feat?' feat':'');
   var np=!p[2];d.innerHTML=(feat?'<span class="badge">Most booked</span>':'')+'<div class="from">'+(np?'Custom quote':'Starting at*')+'</div><h3>'+p[0]+'</h3><p class="for"><span class="rf">Recommended for</span>'+p[1]+'</p>'+(np?'<div class="price"><span style="font-size:.46em;line-height:1;display:block">Priced after your consultation</span></div><div class="ret">Retainer set when we talk</div>':'<div class="price">'+p[2]+'<small>starting estimate*</small></div><div class="ret">Retainer to hold your date: '+p[3]+'</div>')+'<ul>'+p.slice(4).map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><button class="btn" type="button">'+(np?'Book a consultation':'Choose '+p[0])+' &#8599;&#xFE0E;</button>';
   $('button',d).addEventListener('click',function(){S.tier=tierStr(pl,p);S.lane=LANE[pl];sync();go('inquiry')});return d}
 function drawP(){$$('button',pf).forEach(function(b){b.classList.toggle('on',b.getAttribute('data-k')===pl)});tg.innerHTML='';
